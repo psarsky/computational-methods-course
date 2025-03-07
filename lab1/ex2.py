@@ -1,21 +1,28 @@
 import numpy as np
 import time
 
+
 def kahan(array):
     sum = np.float32(0.0)
     error = np.float32(0.0)
+
     for i in range(len(array)):
         y = array[i] - error
         temp = sum + y
         error = (temp - sum) - y
         sum = temp
+
     return sum
+
 
 def recursive_sum(arr):
     if len(arr) == 1:
         return arr[0]
+    
     mid = len(arr) // 2
+
     return recursive_sum(arr[:mid]) + recursive_sum(arr[mid:])
+
 
 # 1
 N = 10**7
@@ -51,10 +58,12 @@ print(f'Relative error (np): {relative_error_np}')
 print(f'Relative error (rc): {relative_error_rc}')
 print(f'Relative error (kh): {relative_error_kh}')
 
+
 # 2
 # Kahan's algorithm has better computational properties thanks to reducing the
 # accumulated rounding error. The "err" variable is utilized to compensate
 # the errors by storing values lost while adding floating point numbers.
+
 
 # 3
 start_time = time.time()

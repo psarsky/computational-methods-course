@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 
+
 # 1
 N = 10**7
 v = np.float32(0.1)
@@ -16,6 +17,7 @@ computed_sum_py = sum(array)
 computed_sum_np = np.sum(array)
 
 exact_sum = N * v
+
 
 # 2
 absolute_error_lp = abs(computed_sum_lp - exact_sum)
@@ -35,6 +37,7 @@ print(f'Relative error (lp): {relative_error_lp}')
 print(f'Relative error (py): {relative_error_py}')
 print(f'Relative error (np): {relative_error_np}')
 
+
 # 3
 errors = []
 current_sum = np.float32(0.0)
@@ -52,6 +55,7 @@ plt.ylabel('Relative error')
 plt.title('Relative error growth')
 plt.show()
 
+
 # 4
 def recursive_sum(arr):
     if len(arr) == 1:
@@ -62,11 +66,13 @@ def recursive_sum(arr):
 recursive_result = recursive_sum(array)
 print(f'Recursive sum: {recursive_result}')
 
+
 # 5
 recursive_absolute_error = abs(recursive_result - exact_sum)
 recursive_relative_error = recursive_absolute_error / exact_sum
 print(f'Recursive Absolute Error: {recursive_absolute_error}')
 print(f'Recursive Relative Error: {recursive_relative_error}')
+
 
 # 6
 start_time = time.time()
@@ -84,6 +90,7 @@ time_rec = time.time() - start_time
 print(f'Python sum time: {time_py:.5f} seconds')
 print(f'Numpy sum time: {time_np:.5f} seconds')
 print(f'Recursive sum time: {time_rec:.5f} seconds')
+
 
 # 7
 v_1 = np.float32(0.5315)
