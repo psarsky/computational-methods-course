@@ -1,15 +1,13 @@
+import mpmath
+
+
 # Bisection method
 
 # Stop conditions:
 # 1. iteration limit
 # 2. |b - a| < tol
 # 3. f(c) < precision
-
-
-import mpmath
-
-
-def bisection_method(f, a, b, precision, tol, iter_limit):
+def bisection(f, a, b, precision, tol, iter_limit):
     # Convert a and b to given precision
     mpmath.mp.dps = precision
     a, b = mpmath.mpf(a), mpmath.mpf(b)
@@ -37,3 +35,24 @@ def bisection_method(f, a, b, precision, tol, iter_limit):
         iterations += 1
     
     return a + (b - a) / 2, iterations
+
+# Newton method
+def newton(f, df, x0, precision, tol, iter_limit):
+    mpmath.mp.dps = precision
+    x = mpmath.mpf(x0)
+    
+    iterations = 0
+
+    while iterations < iter_limit:
+        fx = f(x)
+        dfx = df(x)
+        
+        x_new = x - fx / dfx
+        
+        if abs(x_new - x) < tol or f(x_new) == 0:
+            return x_new, iterations
+        
+        x = x_new
+        iterations += 1
+    
+    return x, iterations
