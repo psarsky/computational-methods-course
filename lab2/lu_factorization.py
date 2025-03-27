@@ -17,6 +17,7 @@ def lu_factorization(matrix):
 
     return lower, upper
 
+
 def main():
     """Tests LU factorization correctness by computing ||matrix - LU||."""
     sizes = [500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 2137]
@@ -33,6 +34,7 @@ def main():
         error = np.linalg.norm(matrix_orig - lower @ upper)
         print(f"Size {matrix_size}x{matrix_size}: Absolute error = {error:.6e}, "
               f"Relative error = {(error*100)/high:.10f}%, Time = {end - start:.4f}s")
+
 
 if __name__ == "__main__":
     main()
