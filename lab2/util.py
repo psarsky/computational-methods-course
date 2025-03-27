@@ -16,35 +16,39 @@ def load_circuit(filename):
 def verify_circuit(graph, source, target, voltage, eps):
     """Verify if the circuit satisfies Kirchhoff's laws."""
 
-    current_max = max(current for _, _, current in graph.edges(data='current'))
+    current_max = max(abs(current) for _, _, current in graph.edges(data='current'))
     cycles = nx.cycle_basis(graph.to_undirected())
 
-    # First Kirchhoff's law
+    # KCL
     for node in graph.nodes():
-        current = 0
+        current_in = sum(graph.edges[edge]['current'] for edge in graph.in_edges(node))
+        current_out = sum(graph.edges[edge]['current'] for edge in graph.out_edges(node))
 
-        for edge in graph.in_edges(node):   # edges coming into the node
-            current += graph.edges[edge]['current']
-        for edge in graph.out_edges(node):  # edges coming out of the node
-            current -= graph.edges[edge]['current']
-
-        if current > eps * current_max:
+        if abs(current_in - current_out) > eps * current_max:
+            print(f"Node {node} violates KCL: In={current_in}, Out={current_out}")
             return False
 
-    # Second Kirchhoff's law
+    # KVL
     for cycle in cycles:
         cycle_voltage = 0
-        for node_1, node_2 in zip(cycle, cycle[1:] + [cycle[0]]):   # cycle[1:] + [cycle[0]] - cycle is shifted by 1
-            if (node_1, node_2) == (source, target):
-                cycle_voltage += voltage
-            elif (node_1, node_2) == (target, source):
-                cycle_voltage -= voltage
-            elif (node_1, node_2) in graph.edges():
-                cycle_voltage -= graph.edges[node_1, node_2]['resistance'] * graph.edges[node_1, node_2]['current']
-            else:   # (node_2, node_1) in graph.edges()
-                cycle_voltage += graph.edges[node_2, node_1]['resistance'] * graph.edges[node_2, node_1]['current']
 
-        if cycle_voltage > eps * voltage:
+        for i, node in enumerate(cycle):
+            neighbor = cycle[(i + 1) % len(cycle)]
+
+            # Voltage source contribution
+            if (node, neighbor) == (source, target):
+                cycle_voltage += voltage
+            elif (node, neighbor) == (target, source):
+                cycle_voltage -= voltage
+
+            # Resistor voltage drops
+            if graph.has_edge(node, neighbor):
+                cycle_voltage -= graph[node][neighbor]['resistance'] * graph[node][neighbor]['current']
+            elif graph.has_edge(neighbor, node):
+                cycle_voltage += graph[neighbor][node]['resistance'] * graph[neighbor][node]['current']
+
+        if abs(cycle_voltage) > eps * voltage:
+            print(f"KVL Violation in Cycle: {cycle}")
             return False
 
     return True
@@ -53,7 +57,7 @@ def verify_circuit(graph, source, target, voltage, eps):
 def draw_circut(graph, graph_type, eps):
     """Visualize the circuit with currents."""
     currents = [current for _, _, current in graph.edges(data='current')]
-    current_min = min(currents)
+    current_min = 0
     current_max = max(currents)
     edge_labels = {e: f"{(i if i > eps * current_max else 0):.3g} A"
                    for e, i in nx.get_edge_attributes(graph, 'current').items()}

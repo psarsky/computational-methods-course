@@ -4,52 +4,62 @@ import time
 
 import networkx as nx
 import numpy as np
-from gauss_jordan import solve_system
 from test_graphs import generate_test_graphs
 from util import draw_circut, load_circuit, verify_circuit
 
 
 def kirchhoff_analysis(graph, source, target, voltage):
     """Find the currents in the circuit using Kirchhoff's laws."""
-    # Adding a direct edge between source and target with 0 resistance, representing the voltage source
+    # Add a direct edge between source and target with near 0 resistance, representing the voltage source
     if graph.has_edge(source, target):
-        graph[source][target]['resistance'] = 0
+        graph[source][target]['resistance'] = 1e-10
     elif graph.has_edge(target, source):
-        graph[target][source]['resistance'] = 0
+        graph[target][source]['resistance'] = 1e-10
     else:
-        graph.add_edge(source, target, resistance=0)
+        graph.add_edge(source, target, resistance=1e-10)
 
-    edge_amount = graph.number_of_edges()
+    # Necessary data structures for analysis
     edges = list(graph.edges())
+    edge_index = {edge: edge_idx for edge_idx, edge in enumerate(edges)}
     cycles = nx.cycle_basis(graph.to_undirected())
 
-    matrix = np.zeros((edge_amount, edge_amount))
-    vector = np.zeros(edge_amount)
+    # Equation system setup
+    node_amount = graph.number_of_nodes()
+    equation_amount = len(cycles) + node_amount
+    matrix = np.zeros((equation_amount, equation_amount))
+    vector = np.zeros(equation_amount)
 
-    # First Kirchhoff's law - node analysis
-    for i, node in enumerate(graph.nodes()):
-        if len(cycles) + i >= edge_amount:   # No more nodes are processed when the system is fully defined
-            break
-        for (neighbor, node) in graph.in_edges(node):
-            matrix[len(cycles) + i, edges.index((neighbor, node))] = 1
-        for (node, neighbor) in graph.out_edges(node):
-            matrix[len(cycles) + i, edges.index((node, neighbor))] = -1
+    # KCL - node analysis
+    for node_idx, node in enumerate(list(graph.nodes())):
+        for out_edge in graph.out_edges(node):
+            matrix[node_idx, edge_index[out_edge]] = 1
+        for in_edge in graph.in_edges(node):
+            matrix[node_idx, edge_index[in_edge]] = -1
 
-    # Second Kirchhoff's law - mesh analysis
-    for i, cycle in enumerate(cycles):
-        for node_1, node_2 in zip(cycle, cycle[1:] + [cycle[0]]):   # cycle[1:] + [cycle[0]] - cycle is shifted by 1
-            if (node_1, node_2) == (source, target):
-                vector[i] = voltage
-            elif (node_1, node_2) == (target, source):
-                vector[i] = -voltage
-            elif (node_1, node_2) in edges:
-                matrix[i, edges.index((node_1, node_2))] = graph[node_1][node_2]['resistance']
-            else:   #(node_1, node_2) in edges
-                matrix[i, edges.index((node_2, node_1))] = -graph[node_2][node_1]['resistance']
+    # KVL - mesh analysis
+    for cycle_idx, cycle in enumerate(cycles):
+        row_idx = node_amount + cycle_idx
 
-    currents = solve_system(matrix, vector)
+        for node_idx, node in enumerate(cycle):
+            neighbor = cycle[(node_idx + 1) % len(cycle)]
 
-    # Adding currents to the graph and adjusting edge directions
+            # Verify if the edge represents the voltage source
+            if (node, neighbor) == (source, target):
+                vector[row_idx] = voltage
+            elif (node, neighbor) == (target, source):
+                vector[row_idx] = -voltage
+
+            if graph.has_edge(node, neighbor):
+                matrix[row_idx, edge_index[(node, neighbor)]] = graph.edges[(node, neighbor)]['resistance']
+            elif graph.has_edge(neighbor, node):
+                matrix[row_idx, edge_index[(neighbor, node)]] = -graph.edges[(neighbor, node)]['resistance']
+            else:
+                continue
+
+    # Solve the overdetermined system
+    currents = np.linalg.lstsq(matrix, vector)[0]
+
+    # Add currents to the graph and adjust edge directions
     for i, (node_1, node_2) in enumerate(graph.copy().edges()):
         if currents[i] < 0:
             resistance = graph.edges[node_1, node_2]['resistance']
