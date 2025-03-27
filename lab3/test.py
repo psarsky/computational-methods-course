@@ -1,11 +1,15 @@
-import mpmath
+"""Test the root-finding methods on the test functions."""
 import time
+
 import matplotlib.pyplot as plt
-from methods import bisection, newton, secant, combo, bisection_vis, newton_vis, secant_vis, combo_vis
-from test_functions import f_1, f_2, f_3, df_1, df_2, df_3
+import mpmath
+from methods import (bisection, bisection_vis, combo, combo_vis, newton,
+                     newton_vis, secant, secant_vis)
+from test_functions import df_1, df_2, df_3, f_1, f_2, f_3
 
 
 def print_bisection(f, a, b, precision, tol, iter_limit):
+    """Print the results of the bisection method."""
     print("")
     print("Bisection method:")
     start = time.time()
@@ -17,6 +21,7 @@ def print_bisection(f, a, b, precision, tol, iter_limit):
 
 
 def print_newton(f, df, b, precision, tol, iter_limit):
+    """Print the results of Newton's method."""
     print("")
     print("Newton method:")
     start = time.time()
@@ -28,6 +33,7 @@ def print_newton(f, df, b, precision, tol, iter_limit):
 
 
 def print_secant(f, a, b, precision, tol, iter_limit):
+    """Print the results of the secant method."""
     print("")
     print("Secant method:")
     start = time.time()
@@ -39,6 +45,7 @@ def print_secant(f, a, b, precision, tol, iter_limit):
 
 
 def print_combo(f, df, a, b, precision, tol, iter_limit):
+    """Print the results of the bisection + Newton method."""
     print("")
     print("Bisection + Newton method:")
     start = time.time()
@@ -50,6 +57,7 @@ def print_combo(f, df, a, b, precision, tol, iter_limit):
 
 
 def main():
+    """Test the root-finding methods on the test functions."""
     precision = int(input("Enter precision: "))
     tol = float(input("Enter tolerance: "))
     iter_limit = int(input("Enter iteration limit: "))
