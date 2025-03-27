@@ -70,20 +70,20 @@ def main():
     print("Enter parameters (press Enter to use default values):")
     start_input = input(f"Start node (default = {DEFAULT_SOURCE}): ")
     source = int(start_input) if start_input else DEFAULT_SOURCE
-    target_input = input("Target node (default = {DEFAULT_TARGET}): ")
+    target_input = input(f"Target node (default = {DEFAULT_TARGET}): ")
     target = int(target_input) if target_input else DEFAULT_TARGET
-    voltage_input = input("Voltage (default = {DEFAULT_VOLTAGE}): ")
+    voltage_input = input(f"Voltage (default = {DEFAULT_VOLTAGE}): ")
     voltage = int(voltage_input) if voltage_input else DEFAULT_VOLTAGE
-    nodes_input = input("Node amount (default = {DEFAULT_NODES}): ")
+    nodes_input = input(f"Node amount (default = {DEFAULT_NODES}): ")
     nodes = int(nodes_input) if nodes_input else DEFAULT_NODES
     while nodes % 2 != 0:
         nodes_input = input("NODE AMOUNT MUST BE EVEN: ")
         nodes = int(nodes_input) if nodes_input else DEFAULT_NODES
-    eps_input = input("Epsilon (default = {DEFAULT_EPS}): ")
+    eps_input = input(f"Epsilon (default = {DEFAULT_EPS}): ")
     eps = float(eps_input) if eps_input else DEFAULT_EPS
 
     generate_test_graphs(nodes)
-    directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_graphs")
+    directory = os.path.join(os.path.dirname(os.path.abspath('')), "test_graphs")
     graphs = {
         "Erdos-Renyi":      load_circuit(os.path.join(directory, "erdos_renyi.txt")),
         "Cubic":            load_circuit(os.path.join(directory, "cubic_graph.txt")),
