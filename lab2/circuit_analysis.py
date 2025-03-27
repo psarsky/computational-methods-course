@@ -83,7 +83,7 @@ def main():
     eps = float(eps_input) if eps_input else DEFAULT_EPS
 
     generate_test_graphs(nodes)
-    directory = os.path.join(os.path.dirname(os.path.abspath('')), "test_graphs")
+    directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_graphs")
     graphs = {
         "Erdos-Renyi":      load_circuit(os.path.join(directory, "erdos_renyi.txt")),
         "Cubic":            load_circuit(os.path.join(directory, "cubic_graph.txt")),

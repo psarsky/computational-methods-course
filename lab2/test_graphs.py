@@ -7,7 +7,7 @@ import numpy as np
 
 def save_graph_to_file(graph, filename):
     """Save graph data to a text file."""
-    directory = os.path.join(os.path.dirname(os.path.abspath('')), "test_graphs")
+    directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_graphs")
     os.makedirs(directory, exist_ok=True)
     file_path = os.path.join(directory, filename)
 
