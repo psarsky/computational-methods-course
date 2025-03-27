@@ -1,7 +1,10 @@
+"""Exercise 4c: Iterations to reach zero for r=4"""
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def count_iterations_to_zero(x0, iter_limit, r=4, dtype=np.float32):
+    """Count the number of iterations needed for the logistic map to reach zero."""
     x = dtype(x0)
     for i in range(iter_limit):
         x = dtype(r * x * (1 - x))
@@ -10,9 +13,10 @@ def count_iterations_to_zero(x0, iter_limit, r=4, dtype=np.float32):
             return i
     return iter_limit
 
+
 x_values = np.linspace(0.001, 0.999, 100)
-iter_limit = int(input("Enter the iteration limit: "))
-iterations_needed = [count_iterations_to_zero(x, iter_limit) for x in x_values]
+iter_lim = int(input("Enter the iteration limit: "))
+iterations_needed = [count_iterations_to_zero(x, iter_lim) for x in x_values]
 
 plt.figure(figsize=(10, 5))
 plt.plot(x_values, iterations_needed, marker="o", linestyle="")

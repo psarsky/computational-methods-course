@@ -1,8 +1,10 @@
-import numpy as np
+"""Exercise 4a: Bifurcation diagram for logistic map with different initial conditions."""
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def logistic_map(x, r):
+    """Compute the logistic map."""
     return r * x * (1 - x)
 
 
@@ -17,17 +19,17 @@ colors = ['red', 'orange', 'yellow', 'green', 'blue']
 
 for x0 in x0_values:
     x_results = []
-    for r in r_values:
-        x = x0
+    for r_val in r_values:
+        x_val = x0
         trajectory = []
         for _ in range(iterations):
-            x = logistic_map(x, r)
+            x_val = logistic_map(x_val, r_val)
             if _ >= (iterations - last):
-                trajectory.append(x)
+                trajectory.append(x_val)
         x_results.append(trajectory)
 
-    for i in range(len(r_values)):
-        plt.scatter([r_values[i]] * last, x_results[i], s=0.1, label=f'$x_0 = {x0}$' if i == 0 else "",
+    for i, r_val in enumerate(r_values):
+        plt.scatter([r_val] * last, x_results[i], s=0.1, label=f'$x_0 = {x0}$' if i == 0 else "",
                     alpha=0.6, color=colors[x0_values.index(x0)])
 
 plt.xlabel("r")
