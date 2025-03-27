@@ -1,112 +1,121 @@
+"""Excercise 3: Partial sums."""
 import numpy as np
 
 
 def partial_sum_zeta_float32(s, n):
-    sum_ = np.float32(0.0)
+    """Compute the partial sum of the Riemann zeta function using single precision."""
+    res = np.float32(0.0)
 
-    for k in range(1, n+1):
+    for k in range(1, n + 1):
         val = np.float32(1.0 / (k**s))
-        sum_ += val
+        res += val
 
-    return sum_
+    return res
 
 
 def partial_sum_zeta_float64(s, n):
-    sum_ = 0.0
+    """Compute the partial sum of the Riemann zeta function using double precision."""
+    res = 0.0
 
-    for k in range(1, n+1):
+    for k in range(1, n + 1):
         val = 1.0 / (k**s)
-        sum_ += val
+        res += val
 
-    return sum_
+    return res
 
 
 def partial_sum_eta_float32(s, n):
-    sum_ = np.float32(0.0)
+    """Compute the partial sum of the Dirichlet eta function using single precision."""
+    res = np.float32(0.0)
     sign = np.float32(1.0)
 
-    for k in range(1, n+1):
-        val = np.float32(sign * (1.0/(k**s)))
-        sum_ += val
+    for k in range(1, n + 1):
+        val = np.float32(sign * (1.0 / (k**s)))
+        res += val
         sign = -sign
 
-    return sum_
+    return res
 
 
 def partial_sum_eta_float64(s, n):
-    sum_ = 0.0
+    """Compute the partial sum of the Dirichlet eta function using double precision."""
+    res = 0.0
     sign = 1.0
 
-    for k in range(1, n+1):
-        val = sign * (1.0/(k**s))
-        sum_ += val
+    for k in range(1, n + 1):
+        val = sign * (1.0 / (k**s))
+        res += val
         sign = -sign
 
-    return sum_
+    return res
 
 
 def partial_sum_zeta_float32_rev(s, n):
-    sum_ = np.float32(0.0)
+    """Compute the partial sum of the Riemann zeta function using single precision - backward."""
+    res = np.float32(0.0)
 
     for k in range(n, 0, -1):
         val = np.float32(1.0 / (k**s))
-        sum_ += val
+        res += val
 
-    return sum_
+    return res
 
 
 def partial_sum_zeta_float64_rev(s, n):
-    sum_ = 0.0
+    """Compute the partial sum of the Riemann zeta function using double precision - backward."""
+    res = 0.0
 
     for k in range(n, 0, -1):
         val = 1.0 / (k**s)
-        sum_ += val
+        res += val
 
-    return sum_
+    return res
 
 
 def partial_sum_eta_float32_rev(s, n):
-    sum_ = np.float32(0.0)
-    sign = np.float32((-1)**(n-1))
+    """Compute the partial sum of the Dirichlet eta function using single precision - backward."""
+    res = np.float32(0.0)
+    sign = np.float32((-1)**(n - 1))
 
     for k in range(n, 0, -1):
         val = np.float32(sign * (1.0 / (k**s)))
-        sum_ += val
+        res += val
         sign = -sign
 
-    return sum_
+    return res
 
 
 def partial_sum_eta_float64_rev(s, n):
-    sum_ = 0.0
-    sign = (-1)**(n-1)
+    """Compute the partial sum of the Dirichlet eta function using double precision - backward."""
+    res = 0.0
+    sign = (-1)**(n - 1)
 
     for k in range(n, 0, -1):
         val = sign * (1.0 / (k**s))
-        sum_ += val
+        res += val
         sign = -sign
 
-    return sum_
+    return res
 
 
 s_values = [2, 3.6667, 7, 10]
 n_values = [50, 100, 200, 500, 1000]
 
-for s in s_values:
-    print(f'\n================ s = {s} ================')
+for s_val in s_values:
+    print(f'\n================ s = {s_val} ================')
 
-    for n in n_values:
-        z32_fwd = partial_sum_zeta_float32(s, n)
-        z32_bwd = partial_sum_zeta_float32_rev(s, n)
-        z64_fwd = partial_sum_zeta_float64(s, n)
-        z64_bwd = partial_sum_zeta_float64_rev(s, n)
+    for n_val in n_values:
+        z32_fwd = partial_sum_zeta_float32(s_val, n_val)
+        z32_bwd = partial_sum_zeta_float32_rev(s_val, n_val)
+        z64_fwd = partial_sum_zeta_float64(s_val, n_val)
+        z64_bwd = partial_sum_zeta_float64_rev(s_val, n_val)
 
-        e32_fwd = partial_sum_eta_float32(s, n)
-        e32_bwd = partial_sum_eta_float32_rev(s, n)
-        e64_fwd = partial_sum_eta_float64(s, n)
-        e64_bwd = partial_sum_eta_float64_rev(s, n)
+        e32_fwd = partial_sum_eta_float32(s_val, n_val)
+        e32_bwd = partial_sum_eta_float32_rev(s_val, n_val)
+        e64_fwd = partial_sum_eta_float64(s_val, n_val)
+        e64_bwd = partial_sum_eta_float64_rev(s_val, n_val)
 
-        print(f'n = {n}')
+        print(f'n = {n_val}')
         print(f'  Zeta float32 forward:  {z32_fwd:.16f}')
         print(f'  Zeta float32 backward: {z32_bwd:.16f}')
         print(f'  Zeta float64 forward:  {z64_fwd:.16f}')

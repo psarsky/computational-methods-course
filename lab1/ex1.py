@@ -1,6 +1,8 @@
-import numpy as np
-import matplotlib.pyplot as plt
+"""Exercise 1: Summation of single-precision numbers."""
 import time
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 # 1
@@ -58,6 +60,7 @@ plt.show()
 
 # 4
 def recursive_sum(arr):
+    """Recursively computes the sum of an array."""
     if len(arr) == 1:
         return arr[0]
     mid = len(arr) // 2
