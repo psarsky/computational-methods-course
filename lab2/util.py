@@ -58,6 +58,7 @@ def draw_circut(graph, graph_type, eps):
     edge_labels = {e: f"{(i if i > eps * current_max else 0):.3g} A"
                    for e, i in nx.get_edge_attributes(graph, 'current').items()}
 
+    plt.figure(figsize=(16, 9))
     pos = nx.kamada_kawai_layout(graph)
     nx.draw_networkx_nodes(graph, pos, node_color='black')
     nx.draw_networkx_labels(graph, pos, font_color='white')
