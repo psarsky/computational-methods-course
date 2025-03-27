@@ -63,7 +63,15 @@ def draw_circut(graph, graph_type, eps):
                    for e, i in nx.get_edge_attributes(graph, 'current').items()}
 
     plt.figure(figsize=(16, 9))
-    pos = nx.kamada_kawai_layout(graph)
+    match(graph_type):
+        case "Grid":
+            pos = nx.spectral_layout(graph)
+        case "Small world":
+            even = [node for node in graph.nodes() if node % 2 == 0]
+            odd = [node for node in graph.nodes() if node % 2 == 1]
+            pos = nx.shell_layout(graph, nlist=[sorted(even), sorted(odd)], rotate=0)
+        case _:
+            pos = nx.kamada_kawai_layout(graph)
     nx.draw_networkx_nodes(graph, pos, node_color='black')
     nx.draw_networkx_labels(graph, pos, font_color='white')
     nx.draw_networkx_edges(graph, pos, width=2, edge_color=currents, edge_cmap=plt.cm.plasma,
