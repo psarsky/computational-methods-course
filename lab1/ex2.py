@@ -1,24 +1,28 @@
-import numpy as np
+"""Exercise 2: Kahan's algorithm."""
 import time
 
+import numpy as np
 
-def kahan(array):
-    sum = np.float32(0.0)
+
+def kahan(arr):
+    """Kahan's algorithm for summation."""
+    res = np.float32(0.0)
     error = np.float32(0.0)
 
-    for i in range(len(array)):
-        y = array[i] - error
-        temp = sum + y
-        error = (temp - sum) - y
-        sum = temp
+    for _, element in enumerate(arr):
+        y = element - error
+        temp = res + y
+        error = (temp - res) - y
+        res = temp
 
-    return sum
+    return res
 
 
 def recursive_sum(arr):
+    """Recursively computes the sum of an array."""
     if len(arr) == 1:
         return arr[0]
-    
+
     mid = len(arr) // 2
 
     return recursive_sum(arr[:mid]) + recursive_sum(arr[mid:])
