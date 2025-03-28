@@ -11,16 +11,9 @@ from util import draw_circut, load_circuit, verify_circuit
 def kirchhoff_analysis(graph, source, target, voltage):
     """Find the currents in the circuit using Kirchhoff's laws."""
     # Add a direct edge between source and target with near 0 resistance, representing the voltage source
-    if graph.has_edge(source, target):
-        graph[source][target]['resistance'] = 1e-10
-    elif graph.has_edge(target, source):
-        graph[target][source]['resistance'] = 1e-10
-    else:
-        graph.add_edge(source, target, resistance=1e-10)
+    graph.add_edge(source, target, resistance=1e-10)
 
-    # Necessary data structures for analysis
     edges = list(graph.edges())
-    edge_index = {edge: edge_idx for edge_idx, edge in enumerate(edges)}
     cycles = nx.cycle_basis(graph.to_undirected())
 
     # Equation system setup
@@ -32,9 +25,9 @@ def kirchhoff_analysis(graph, source, target, voltage):
     # KCL - node analysis
     for node_idx, node in enumerate(list(graph.nodes())):
         for out_edge in graph.out_edges(node):
-            matrix[node_idx, edge_index[out_edge]] = 1
+            matrix[node_idx, edges.index(out_edge)] = 1
         for in_edge in graph.in_edges(node):
-            matrix[node_idx, edge_index[in_edge]] = -1
+            matrix[node_idx, edges.index(in_edge)] = -1
 
     # KVL - mesh analysis
     for cycle_idx, cycle in enumerate(cycles):
@@ -50,9 +43,9 @@ def kirchhoff_analysis(graph, source, target, voltage):
                 vector[row_idx] = -voltage
 
             if graph.has_edge(node, neighbor):
-                matrix[row_idx, edge_index[(node, neighbor)]] = graph.edges[(node, neighbor)]['resistance']
+                matrix[row_idx, edges.index((node, neighbor))] = graph.edges[(node, neighbor)]['resistance']
             elif graph.has_edge(neighbor, node):
-                matrix[row_idx, edge_index[(neighbor, node)]] = -graph.edges[(neighbor, node)]['resistance']
+                matrix[row_idx, edges.index((neighbor, node))] = -graph.edges[(neighbor, node)]['resistance']
             else:
                 continue
 
