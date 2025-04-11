@@ -1,10 +1,11 @@
+"""Sphere transformation and SVD visualization"""
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import linalg
 
 
 def create_unit_sphere(resolution=30):
-
+    """Creates a unit sphere using spherical coordinates."""
     s = np.linspace(0, 2*np.pi, resolution)
     t = np.linspace(0, np.pi, resolution)
 
@@ -20,10 +21,12 @@ def create_unit_sphere(resolution=30):
 
 
 def transform_sphere(points, A):
+    """Transforms points using matrix A."""
     return points @ A.T
 
 
 def plot_ellipsoid(sphere_coords, transformed_points, singular_values, V, title):
+    """Plots the ellipsoid defined by the transformed points and the singular values."""
     fig = plt.figure(figsize=(12, 8))
     ax = fig.add_subplot(111, projection='3d')
 
@@ -57,7 +60,8 @@ def plot_ellipsoid(sphere_coords, transformed_points, singular_values, V, title)
     return fig, ax
 
 
-def visualize_svd_components(sphere_points, A, sigma, VT, title):
+def visualize_svd_steps(sphere_points, A, sigma, VT, title):
+    """Visualizes the steps of SVD."""
     fig = plt.figure(figsize=(18, 6))
 
     # SV^T
@@ -81,7 +85,7 @@ def visualize_svd_components(sphere_points, A, sigma, VT, title):
     ssigma_vt_points_matrix = ssigma_vt_points.reshape(30, 30, 3)
     ax2.plot_surface(ssigma_vt_points_matrix[:,:,0],
                      ssigma_vt_points_matrix[:,:,1],
-                     ssigma_vt_points_matrix[:,:,2], 
+                     ssigma_vt_points_matrix[:,:,2],
                      color='g',
                      alpha=0.3)
     ax2.set_title("SΣV^T")
@@ -116,22 +120,23 @@ def visualize_svd_components(sphere_points, A, sigma, VT, title):
 
 
 def main():
-    # 1. sfera
+    """Main function to run the transformations and visualizations."""
+    # 1. Create unit sphere
     sphere_points, x_sphere, y_sphere, z_sphere = create_unit_sphere(resolution=30)
     sphere_coords = (x_sphere, y_sphere, z_sphere)
 
-    #2. transformacje
-    # A1: skalowanie
+    # 2. Transformations
+    # A1: scaling
     A1 = np.diag([2, 1, 0.5])
 
-    # A2: rotacja i skalowanie
+    # A2: rotation + scaling
     A2 = np.array([
         [1, 0.5, 0],
         [0.5, 2, 0],
         [0, 0, 1.5]
     ])
 
-    # A3: Bardziej złożona transformacja
+    # A3: More complex transformation
     A3 = np.array([
         [3, 1, 0.5],
         [1, 2, 0],
@@ -153,20 +158,17 @@ def main():
     plot_ellipsoid(sphere_coords, transformed_points3, sigma3, VT3.T, "A3")
     plt.show()
 
-    # 4. duży stosunek wartości osobliwych
+    # 4. Large semi-axis ratio
     A4 = np.diag([20, 5, 0.1])
 
-    _, sigma4_check, _ = linalg.svd(A4)
     _, sigma4, V4 = linalg.svd(A4)
-    ratio = sigma4_check[0] / sigma4_check[-1]
-    print(f"Stosunek największej do najmniejszej wartości osobliwej: {ratio}")
 
     transformed_points4 = transform_sphere(sphere_points, A4)
-    plot_ellipsoid(sphere_coords, transformed_points4, sigma4, V4, "Elipsoida z dużym stosunkiem półosi")
+    plot_ellipsoid(sphere_coords, transformed_points4, sigma4, V4, "Ellipsoid with large semi-axis ratio")
     plt.show()
 
-    # 5. kroki
-    visualize_svd_components(sphere_points, A1, sigma1, VT1, "Dekompozycja SVD dla macierzy A1")
+    # 5. SVD steps
+    visualize_svd_steps(sphere_points, A1, sigma1, VT1, "SVD steps for A1 matrix")
     plt.show()
 
 
