@@ -1,3 +1,4 @@
+"""Image compression using SVD"""
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import linalg
@@ -7,6 +8,7 @@ from numpy.linalg import norm
 
 
 def prepare_image():
+    """Loads and prepares the image for processing."""
     img = data.astronaut()
     img = img[50:550, 50:550]
 
@@ -19,6 +21,7 @@ def prepare_image():
 
 
 def compress_image(img, k_values):
+    """Compresses the image using SVD for different values of k."""
     U, sigma, VT = linalg.svd(img)
 
     compressed_images = {}
@@ -35,6 +38,7 @@ def compress_image(img, k_values):
 
 
 def compare_images(original_img, compressed_images, k_values):
+    """Compares  and visualizes the original and compressed images."""
     n = len(k_values)
 
     differences = {}
@@ -62,6 +66,7 @@ def compare_images(original_img, compressed_images, k_values):
         axes[1, i+1].axis('off')
 
     plt.tight_layout()
+    plt.show()
 
     plt.figure(figsize=(10, 6))
     plt.plot(k_values, [norms[k] for k in k_values], 'o-')
@@ -73,6 +78,7 @@ def compare_images(original_img, compressed_images, k_values):
 
 
 def analyze_compression(img, k_values):
+    """Analyzes the compression ratio for different values of k."""
     original_size = img.shape[0] * img.shape[1]
 
     for k in k_values:
@@ -82,6 +88,7 @@ def analyze_compression(img, k_values):
 
 
 def main():
+    """Main function to execute the image compression and analysis."""
     k_values = [1, 5, 10, 20, 50, 100, 200]
 
     img = prepare_image()
