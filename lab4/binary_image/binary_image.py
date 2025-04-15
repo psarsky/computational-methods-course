@@ -128,7 +128,7 @@ def main():
             '8',
             energy_function=energy_fn,
             cooling_rate=0.999,
-            threshold=1e-3
+            threshold=1e-5
         )
 
         animate(f"{energy_fn_name}.html", images, energy_fn, '8', framerate=30)

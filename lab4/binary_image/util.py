@@ -101,7 +101,6 @@ def animate(filename, images, energy_function, neighborhood_type, framerate=30):
         ax.set_yticks([])
 
         ax.imshow(frame, cmap=cmap)
-        ax.legend()
 
     fig, ax = plt.subplots(figsize=(8, 8))
     step = len(images) // 200
