@@ -16,7 +16,7 @@ def print_board(board):
         print(row_str)
 
 
-def plot_board(board):
+def plot_board(board, title):
     """Plots the Sudoku board."""
     _, ax = plt.subplots(figsize=(6, 6))
     ax.matshow(board, cmap='Blues', alpha=0.5)
@@ -53,9 +53,11 @@ def plot_board(board):
         ax.axhline(i - 0.5, color='black', lw=lw)
         ax.axvline(i - 0.5, color='black', lw=lw)
 
+    plt.title(title)
     plt.xticks([])
     plt.yticks([])
     plt.show()
+
 
 def plot_convergence(iterations_history, cost_history, empty_count):
     """Plots the convergence of the algorithm."""
@@ -68,13 +70,13 @@ def plot_convergence(iterations_history, cost_history, empty_count):
     plt.show()
 
 
-def plot_iters_vs_empty_cells(iteration_counts, empty_counts):
+def plot_vs_empty_cells(iteration_counts, empty_counts, name):
     """Plots the number of iterations vs. the number of empty cells."""
     plt.figure(figsize=(10, 6))
     plt.scatter(empty_counts, iteration_counts)
-    plt.title('Iterations vs. empty cells')
+    plt.title(f'{name} vs. empty cells')
     plt.xlabel('Empty cell amount')
-    plt.ylabel('Iterations')
+    plt.ylabel(name)
     plt.grid(True)
 
     if len(empty_counts) > 1:
