@@ -3,30 +3,9 @@ import math
 import random
 import time
 
-from util import (find_empty_cells, generate_neighbor_state_random,
-                  initialize_board, load_board)
-from vis import (plot_board, plot_convergence, plot_vs_empty_cells,
-                 print_board)
-
-
-def calculate_cost(board):
-    """Calculates the cost as the sum of digit repetitions in rows, columns, and 3x3 blocks."""
-    cost = 0
-
-    for i in range(9):
-        row = board[i, :]
-        cost += 9 - len(set(row))
-
-    for j in range(9):
-        col = board[:, j]
-        cost += 9 - len(set(col))
-
-    for block_i in range(0, 9, 3):
-        for block_j in range(0, 9, 3):
-            block = board[block_i:block_i+3, block_j:block_j+3].flatten()
-            cost += 9 - len(set(block))
-
-    return cost
+from util import (calculate_cost, find_empty_cells,
+                  generate_neighbor_state_random, initialize_board, load_board)
+from vis import plot_board, plot_convergence, plot_vs_empty_cells, print_board
 
 
 def simulated_annealing(orig_board, empty, initial_temp=1000, cooling_rate=0.999,
