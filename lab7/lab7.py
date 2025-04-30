@@ -1,11 +1,14 @@
+"""Eigendecomposition of a matrix"""
 import time
 
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.linalg import eig
+from scipy.linalg import lu_factor, lu_solve
 
 
 def power_method(A, max_iter=10000, eps=1e-15):
+    """Power method for finding the largest eigenvalue and corresponding eigenvector of a matrix A."""
     n = A.shape[0]
 
     x = np.random.rand(n)
@@ -31,7 +34,39 @@ def power_method(A, max_iter=10000, eps=1e-15):
     return eigenvalue, eigenvector, i + 1
 
 
+def inverse_power_method(A, sigma, max_iter=10000, tol=1e-15):
+    """Inverse power method which utilizes LU factorization."""
+    n = A.shape[0]
+
+    A_shifted = A - sigma * np.eye(n)
+
+    lu, piv = lu_factor(A_shifted)
+
+    x = np.random.rand(n)
+    x = x / np.max(np.abs(x))
+
+    eigenvalue = 0
+    for i in range(max_iter):
+        x_new = lu_solve((lu, piv), x)
+
+        max_abs = np.max(np.abs(x_new))
+        x_new = x_new / max_abs
+
+        mu = 1.0 / max_abs
+        eigenvalue = sigma + mu
+
+        if np.max(np.abs(x_new - x)) < tol:
+            break
+
+        x = x_new
+
+    eigenvector = x_new / np.linalg.norm(x_new)
+
+    return eigenvalue, eigenvector, i+1
+
+
 def compare_with_library(A):
+    """Compares custom power method implementation with library function."""
     start_time = time.time()
     eigen_val, eigen_vec, iterations = power_method(A)
     custom_time = time.time() - start_time
@@ -63,6 +98,7 @@ def compare_with_library(A):
 
 
 def benchmark_sizes():
+    """Benchmarks the custom implementation against the library function for different matrix sizes."""
     sizes = [100, 200, 500, 1000, 2000]
     custom_times = []
     library_times = []
@@ -89,6 +125,7 @@ def benchmark_sizes():
 
 
 def plot_benchmark(sizes, custom_times, library_times):
+    """Plots the benchmark results."""
     plt.figure(figsize=(10, 6))
     plt.plot(sizes, custom_times, 'o-', label='Custom implementation')
     plt.plot(sizes, library_times, 's-', label='Library implementation')
