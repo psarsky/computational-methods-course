@@ -2,3 +2,6 @@
 __pycache__
 test_graphs
 animations
+*.db
+.report_template_sm.ipynb
+.report_template_lg.ipynb
