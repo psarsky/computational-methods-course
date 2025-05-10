@@ -1,9 +1,12 @@
+"""Display functions for the random walk ranking algorithm."""
+
 import matplotlib.pyplot as plt
 import networkx as nx
 import pandas as pd
 
 
 def display_results(results):
+    """Displays the random walk algorithm results in a dataframe."""
     rows = []
     for graph_name, graph_results in results.items():
         for d, d_results in graph_results.items():
@@ -27,6 +30,7 @@ def display_results(results):
 
 
 def visualize_results(results):
+    """Creates visualizations of the graph structure and ranking distribution."""
     for graph_name, graph_results in results.items():
         for d, d_results in graph_results.items():
             G = d_results["G"]

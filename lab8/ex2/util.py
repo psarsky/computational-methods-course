@@ -1,3 +1,5 @@
+"""Utility functions for the PageRank algorithm."""
+
 import gzip
 import os
 import shutil
@@ -8,6 +10,7 @@ from scipy.sparse import csr_matrix
 
 
 def create_adj_matrix(G):
+    """Creates a regular adjacency matrix from a graph representation."""
     n = G.number_of_nodes()
     A = np.zeros((n, n))
 
@@ -21,6 +24,7 @@ def create_adj_matrix(G):
 
 
 def create_adj_matrix_sparse(G):
+    """Creates a sparse adjacency matrix from a graph representation."""
     n = G.number_of_nodes()
     node_to_index = {node: i for i, node in enumerate(G.nodes())}
     rows, cols, data = [], [], []
@@ -37,6 +41,7 @@ def create_adj_matrix_sparse(G):
 
 
 def download_and_extract(url, output_file):
+    """Downloads and extracts a gzipped file from a URL if it doesn't exist locally."""
     if not os.path.exists(output_file):
         gz_file = f"{output_file}.gz"
         if not os.path.exists(gz_file):

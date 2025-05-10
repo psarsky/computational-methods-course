@@ -1,3 +1,5 @@
+"""Display functions for the PageRank algorithm."""
+
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
@@ -5,6 +7,7 @@ import pandas as pd
 
 
 def display_results(results):
+    """Displays the PageRank algorithm results in a dataframe."""
     rows = []
     for d, d_results in results.items():
         for name, result in d_results.items():
@@ -26,6 +29,7 @@ def display_results(results):
 
 
 def visualize_pagerank_comparison(G, results, d=0.85):
+    """Creates a side-by-side comparison of PageRank results with different jump vectors."""
     jump_vectors = list(results[d].keys())
     num_vectors = len(jump_vectors)
 
@@ -52,6 +56,7 @@ def visualize_pagerank_comparison(G, results, d=0.85):
 
 
 def plot_pagerank_histogram(pr, title):
+    """Plots a histogram of PageRank values for small to medium-sized graphs."""
     plt.figure(figsize=(8, 4))
     plt.hist(pr, bins=50, color="skyblue", edgecolor="black")
     plt.title(f"PageRank histogram: {title}")
@@ -63,6 +68,7 @@ def plot_pagerank_histogram(pr, title):
 
 
 def plot_pagerank_histogram_large(pr, title):
+    """Plots a zoomed-in histogram of PageRank values for large graphs."""
     plt.figure(figsize=(10, 6))
 
     upper_limit = np.percentile(pr, 95)
