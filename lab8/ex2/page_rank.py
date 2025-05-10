@@ -1,3 +1,5 @@
+"""PageRank algorithm with jumps for directed graphs."""
+
 import os
 import time
 
@@ -10,6 +12,7 @@ from vis import (display_results, plot_pagerank_histogram,
 
 
 def pagerank(A, e=None, d=0.85, max_iter=100, tol=1e-6):
+    """Implements the PageRank algorithm with customizable jump vectors."""
     n = A.shape[0]
 
     if e is None:
@@ -34,6 +37,7 @@ def pagerank(A, e=None, d=0.85, max_iter=100, tol=1e-6):
 
 
 def test_karate_club(damping_factors):
+    """Tests the PageRank algorithm on the Karate Club graph."""
     G = nx.karate_club_graph()
     G = G.to_directed()
 
@@ -61,6 +65,7 @@ def test_karate_club(damping_factors):
 
 
 def test_epinions(url, file_path, damping_factors):
+    """Tests the PageRank algorithm on the Epinions social network graph."""
     file_path = download_and_extract(url, file_path)
 
     print(f"Loading graph from {file_path}...")
@@ -88,6 +93,7 @@ def test_epinions(url, file_path, damping_factors):
 
 
 def test_jump_vectors(A, damping_factors, jump_vectors):
+    """Tests different jump vectors with various damping factors on a given graph."""
     results = {}
 
     for d in damping_factors:
@@ -109,6 +115,7 @@ def test_jump_vectors(A, damping_factors, jump_vectors):
 
 
 def main():
+    """Main function that runs PageRank experiments on different graphs."""
     damping_factors = [0.9, 0.85, 0.75, 0.6, 0.5]
 
     print("Testing PageRank with jumps on Karate Club graph\n")

@@ -1,7 +1,10 @@
+"""Utility functions for the random walk ranking algorithm."""
+
 import numpy as np
 
 
 def generate_random_directed_graph(n, p=0.3, seed=None):
+    """Creates a random directed graph with n nodes and edge probability p."""
     if seed is not None:
         np.random.seed(seed)
 
@@ -16,6 +19,7 @@ def generate_random_directed_graph(n, p=0.3, seed=None):
 
 
 def create_adj_matrix(graph):
+    """Creates an adjacency matrix from a graph representation."""
     n = len(graph)
     A = np.zeros((n, n))
 

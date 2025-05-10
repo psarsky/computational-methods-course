@@ -1,3 +1,5 @@
+"""Random walk ranking algorithm for directed graphs."""
+
 import time
 
 import networkx as nx
@@ -7,6 +9,7 @@ from vis import display_results, visualize_results
 
 
 def random_walk(A, d=0.85, max_iter=100, tol=1e-6):
+    """Implements the random walk algorithm for node ranking."""
     n = A.shape[0]
     r = np.ones(n) / n
 
@@ -20,6 +23,7 @@ def random_walk(A, d=0.85, max_iter=100, tol=1e-6):
 
 
 def test_all(graph, d=0.85):
+    """Tests the random walk algorithm on a given graph."""
     adjacency_matrix = create_adj_matrix(graph)
 
     start_time = time.time()
@@ -46,6 +50,7 @@ def test_all(graph, d=0.85):
 
 
 def main():
+    """Main function that creates test graphs and runs the random walk algorithm."""
     graphs = {
         "15-node graph": generate_random_directed_graph(15, p=0.2, seed=123),
         "25-node graph": generate_random_directed_graph(25, p=0.15, seed=456),
