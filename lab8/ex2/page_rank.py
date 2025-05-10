@@ -9,7 +9,7 @@ from vis import (display_results, plot_pagerank_histogram,
                  plot_pagerank_histogram_large, visualize_pagerank_comparison)
 
 
-def pagerank_power_method(A, e=None, d=0.85, max_iter=100, tol=1e-6):
+def pagerank(A, e=None, d=0.85, max_iter=100, tol=1e-6):
     n = A.shape[0]
 
     if e is None:
@@ -94,7 +94,7 @@ def test_jump_vectors(A, damping_factors, jump_vectors):
         d_results = {}
         for name, e in jump_vectors.items():
             start_time = time.time()
-            pr, iterations = pagerank_power_method(A, e=e, d=d)
+            pr, iterations = pagerank(A, e=e, d=d)
             end_time = time.time()
 
             d_results[name] = {
