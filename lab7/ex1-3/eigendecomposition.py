@@ -2,11 +2,11 @@
 
 import time
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from numpy.linalg import eig
 from scipy.linalg import lu_factor, lu_solve
+from vis import plot_benchmark
 
 MAX_ITER = 1000
 EPS = 1e-10
@@ -174,8 +174,7 @@ def compare_methods(A):
     return results
 
 
-def benchmark_sizes():
-    """Benchmarks all implementations against the library function for different matrix sizes."""
+if __name__ == "__main__":
     sizes = [100, 200, 500, 1000]
     methods = ["power_method", "inverse_power_method", "rayleigh_quotient", "library"]
 
@@ -184,111 +183,56 @@ def benchmark_sizes():
     iterations = {method: [] for method in methods if method != "library"}
     all_results = []
 
+    print("\nBenchmarking eigendecomposition methods for different matrix sizes:")
+
     for size in sizes:
         print(f"\nMatrix size: {size}x{size}")
-        print("-" * 50)
+        print("-" * (22 if size == 1000 else 20))
+        print()
 
-        A = np.random.rand(size, size)
-        A = (A + A.T) / 2
+        A_ = np.random.rand(size, size)
+        A_ = (A_ + A_.T) / 2
 
-        results = compare_methods(A)
+        results_ = compare_methods(A_)
 
         size_results = []
         for method in methods:
-            times[method].append(results[method]["time"])
+            times[method].append(results_[method]["time"])
 
             if method != "library":
-                errors[method].append(results[method]["rel_error_val"])
-                iterations[method].append(results[method]["iterations"])
+                errors[method].append(results_[method]["rel_error_val"])
+                iterations[method].append(results_[method]["iterations"])
 
                 row = {
-                    "Matrix Size": f"{size}x{size}",
+                    "Matrix size": f"{size}x{size}",
                     "Method": method.replace("_", " ").title(),
-                    "Eigenvalue": f"{results[method]['eigenvalue']:.12f}",
-                    "Relative Error": f"{results[method]['rel_error_val']:.6e}",
-                    "Vector Similarity": f"{results[method]['vec_similarity']:.12f}",
-                    "Iterations": results[method]["iterations"],
-                    "Time (s)": f"{results[method]['time']:.6f}",
+                    "Eigenvalue": f"{results_[method]['eigenvalue']:.12f}",
+                    "Relative error": f"{results_[method]['rel_error_val']:.6e}",
+                    "Vector similarity": f"{results_[method]['vec_similarity']:.12f}",
+                    "Iterations": results_[method]["iterations"],
+                    "Time": f"{results_[method]['time']:.6f}s",
                 }
                 size_results.append(row)
             else:
                 row = {
-                    "Matrix Size": f"{size}x{size}",
+                    "Matrix size": f"{size}x{size}",
                     "Method": "Library (NumPy)",
-                    "Eigenvalue": f"{results[method]['eigenvalue']:.12f}",
-                    "Relative Error": "N/A",
-                    "Vector Similarity": "N/A",
+                    "Eigenvalue": f"{results_[method]['eigenvalue']:.12f}",
+                    "Relative error": "N/A",
+                    "Vector similarity": "N/A",
                     "Iterations": "N/A",
-                    "Time (s)": f"{results[method]['time']:.6f}",
+                    "Time": f"{results_[method]['time']:.6f}s",
                 }
                 size_results.append(row)
 
         df = pd.DataFrame(size_results)
         print(df.to_string(index=False))
+        print()
+        print("=" * 100)
         all_results.extend(size_results)
 
     summary_df = pd.DataFrame(all_results)
     print("\nSummary of all results:")
     print(summary_df.to_string(index=False))
 
-    return sizes, times, errors, iterations
-
-
-def plot_benchmark(sizes, times, errors, iterations):
-    """Plots the benchmark results."""
-    methods = ["power_method", "inverse_power_method", "rayleigh_quotient", "library"]
-    method_labels = [
-        "Power Method",
-        "Inverse Power Method",
-        "Rayleigh Quotient",
-        "Library (NumPy)",
-    ]
-
-    plt.figure(figsize=(12, 6))
-    for i, method in enumerate(methods):
-        plt.plot(
-            sizes, times[method], marker=["o", "s", "^", "d"][i], label=method_labels[i]
-        )
-
-    plt.xlabel("Matrix size (n x n)")
-    plt.ylabel("Execution time [s]")
-    plt.title("Eigendecomposition Methods - Execution Time Comparison")
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-    plt.show()
-
-    plt.figure(figsize=(12, 6))
-    for i, method in enumerate(methods[:-1]):
-        plt.semilogy(
-            sizes, errors[method], marker=["o", "s", "^"][i], label=method_labels[i]
-        )
-
-    plt.xlabel("Matrix size (n x n)")
-    plt.ylabel("Relative error")
-    plt.title("Eigendecomposition Methods - Relative Error Comparison")
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-    plt.show()
-
-    plt.figure(figsize=(12, 6))
-    for i, method in enumerate(methods[:-1]):
-        plt.plot(
-            sizes, iterations[method], marker=["o", "s", "^"][i], label=method_labels[i]
-        )
-
-    plt.xlabel("Matrix size (n x n)")
-    plt.ylabel("Number of iterations")
-    plt.title("Eigendecomposition Methods - Iteration Count Comparison")
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-    plt.show()
-
-
-if __name__ == "__main__":
-    print("\nBenchmarking eigendecomposition methods for different matrix sizes:")
-    sizes_, times_, errors_, iterations_ = benchmark_sizes()
-
-    plot_benchmark(sizes_, times_, errors_, iterations_)
+    plot_benchmark(sizes, times, errors, iterations)
