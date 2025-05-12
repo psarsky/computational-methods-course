@@ -1,6 +1,4 @@
-"""
-Module for managing the SQLite database used in the web crawler.
-"""
+"""Module for managing the SQLite database used in the web crawler."""
 
 import os
 import sqlite3
@@ -13,9 +11,7 @@ DB_PATH = os.path.join(directory, "simplified_wiki_index.db")
 
 
 def init_database():
-    """
-    Initializes the SQLite database.
-    """
+    """Initializes the SQLite database."""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
@@ -38,8 +34,7 @@ def init_database():
 
 
 def store_page(url, title, content):
-    """
-    Store page information in the database.
+    """Store page information in the database.
 
     Args:
         url: Page URL
@@ -77,8 +72,7 @@ def store_page(url, title, content):
 
 
 def get_stats():
-    """
-    Get statistics about the crawled data.
+    """Get statistics about the crawled data.
 
     Returns:
         dict: Statistics about the crawl

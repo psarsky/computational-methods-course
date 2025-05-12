@@ -1,6 +1,4 @@
-"""
-Crawler test module.
-"""
+"""Crawler test module."""
 
 import os
 import sqlite3
@@ -13,9 +11,7 @@ DB_PATH = os.path.join(
 
 
 def search_index(query, limit=10):
-    """
-    Simple search implementation for testing purposes.
-    """
+    """Simple search implementation for testing purposes."""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 

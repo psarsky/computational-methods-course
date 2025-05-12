@@ -1,13 +1,14 @@
-"""Module for building a term dictionary from documents in a database."""
+"""Module for pre-processing documents and creating a term-document matrix."""
 
 import os
 import re
 import sqlite3
 from collections import Counter
 
-import nltk
+# import nltk
+import numpy as np
 from nltk.corpus import stopwords
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, diags
 
 
 def build_vocabulary(db_path, min_df=5, max_df=0.5, max_features=100000):
@@ -22,7 +23,7 @@ def build_vocabulary(db_path, min_df=5, max_df=0.5, max_features=100000):
     Returns:
         dict: A dictionary mapping terms to their indices.
     """
-    nltk.download("stopwords")
+    # nltk.download("stopwords")
     stop_words = set(stopwords.words("english"))
 
     conn = sqlite3.connect(db_path)
@@ -115,6 +116,29 @@ def create_document_vectors(db_path, vocabulary):
     conn.close()
 
     return term_doc_matrix, doc_ids
+
+
+def apply_idf(term_doc_matrix):
+    """Applies IDF transformation to the term-document matrix.
+
+    Args:
+        term_doc_matrix (scipy.sparse.csr_matrix): Sparse matrix of term-document counts.
+
+    Returns:
+        tuple: A tuple containing:
+            - tfidf_matrix (scipy.sparse.csr_matrix): Sparse matrix of TF-IDF values.
+            - idf_values (numpy.ndarray): Array of IDF values for each term.
+    """
+    _, n_docs = term_doc_matrix.shape
+
+    doc_counts = np.array((term_doc_matrix > 0).sum(axis=1)).flatten()
+
+    idf_values = np.log(n_docs / (doc_counts + 1))  # +1 for stability
+
+    idf_diag = diags(idf_values)
+    tfidf_matrix = idf_diag.dot(term_doc_matrix)
+
+    return tfidf_matrix, idf_values
 
 
 if __name__ == "__main__":

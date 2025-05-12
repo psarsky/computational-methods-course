@@ -1,6 +1,4 @@
-"""
-Crawler module to fetch and parse HTML content from a given URL.
-"""
+"""Crawler module to fetch and parse HTML content from a given URL."""
 
 import time
 from urllib.parse import urljoin
@@ -16,8 +14,7 @@ REQUEST_DELAY = 1
 
 
 def is_valid_wiki_page(url):
-    """
-    Check if URL is a valid Wikipedia article page.
+    """Check if URL is a valid Wikipedia article page.
 
     Args:
         url: URL to check
@@ -50,8 +47,7 @@ def is_valid_wiki_page(url):
 
 
 def normalize_url(url):
-    """
-    Normalize URL to ensure consistent format.
+    """Normalize URL to ensure consistent format.
 
     Args:
         url: URL to normalize
@@ -65,8 +61,7 @@ def normalize_url(url):
 
 
 def extract_content(soup):
-    """
-    Extract relevant content from a Wikipedia page.
+    """Extract relevant content from a Wikipedia page.
 
     Args:
         soup: BeautifulSoup object
@@ -97,8 +92,7 @@ def extract_content(soup):
 
 
 def get_urls_from_special_page(url):
-    """
-    Get URLs from a Special:AllPages page.
+    """Get URLs from a Special:AllPages page.
 
     Args:
         url: URL of the Special:AllPages page
@@ -130,9 +124,7 @@ def get_urls_from_special_page(url):
 
 
 def crawl():
-    """
-    Main crawler function.
-    """
+    """Main crawler function."""
 
     visited_urls = set()
 
