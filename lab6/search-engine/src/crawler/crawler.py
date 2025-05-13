@@ -9,7 +9,7 @@ from database import get_stats, init_database, store_page
 
 session = requests.Session()
 BASE_URL = "https://simple.wikipedia.org"
-START_URL = "https://simple.wikipedia.org/w/index.php?title=Special:AllPages&from=Court+%28law%29"
+START_URL = "https://simple.wikipedia.org/wiki/Special:AllPages"
 REQUEST_DELAY = 1
 
 
@@ -125,60 +125,72 @@ def get_urls_from_special_page(url):
 
 def crawl():
     """Main crawler function."""
-
     visited_urls = set()
 
     current_special_page = START_URL
-    total_pages = 0
-    page_no = 0
+    pages_indexed = 0
+    pages_crawled = 0
+    redirects_skipped = 0
     errors = 0
 
-    while current_special_page:
-        print(f"Processing index page: {current_special_page}")
-        article_urls, next_special_page = get_urls_from_special_page(
-            current_special_page
-        )
+    try:
+        while current_special_page:
+            print(f"\nProcessing index page: {current_special_page}")
 
-        for article_url in article_urls:
-            page_no += 1
-            if article_url in visited_urls:
-                continue
+            article_urls, next_special_page = get_urls_from_special_page(
+                current_special_page
+            )
 
-            try:
-                print(f"Page {page_no}: {article_url}")
-                response = session.get(article_url)
-                soup = BeautifulSoup(response.text, "html.parser")
+            for article_url in article_urls:
+                pages_crawled += 1
+                if article_url in visited_urls:
+                    continue
 
-                title, content = extract_content(soup)
-                store_page(article_url, title, content)
+                try:
+                    print(f"\nPage {pages_crawled}: {article_url}")
 
-                visited_urls.add(article_url)
-                total_pages += 1
+                    response = session.get(article_url)
+                    soup = BeautifulSoup(response.text, "html.parser")
 
-                if total_pages % 100 == 0:
-                    print(f"Total pages crawled: {total_pages}")
+                    redirect_notice = soup.find("span", {"class": "mw-redirectedfrom"})
+                    if redirect_notice:
+                        print("Skipping redirect page.")
+                        redirects_skipped += 1
+                        visited_urls.add(article_url)
+                        time.sleep(REQUEST_DELAY)
+                        continue
 
-                time.sleep(REQUEST_DELAY)
+                    title, content = extract_content(soup)
+                    store_page(article_url, title, content)
 
-            except Exception as e:
-                print(f"Exception: {str(e)}")
-                errors += 1
+                    visited_urls.add(article_url)
+                    pages_indexed += 1
 
-        current_special_page = next_special_page
+                    if pages_crawled % 100 == 0:
+                        print(f"Total pages crawled: {pages_crawled}")
 
-        time.sleep(REQUEST_DELAY)
+                    time.sleep(REQUEST_DELAY)
 
-    print(f"Indexed pages: {total_pages}")
+                except Exception as e:
+                    print(f"Exception: {str(e)}")
+                    errors += 1
+
+            current_special_page = next_special_page
+
+            time.sleep(REQUEST_DELAY)
+    except KeyboardInterrupt:
+        print("\nCrawl interrupted by user")
+
+    print(f"Crawled pages: {pages_crawled}")
+    print(f"Indexed pages: {pages_indexed}")
+    print(f"Skipped redirects: {redirects_skipped}")
     print(f"Errors: {errors}")
 
 
 if __name__ == "__main__":
     init_database()
 
-    try:
-        crawl()
-    except KeyboardInterrupt:
-        print("\nCrawl interrupted by user")
+    crawl()
 
     stats = get_stats()
     print("\nStatistics:")
