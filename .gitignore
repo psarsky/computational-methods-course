@@ -2,6 +2,7 @@
 __pycache__
 test_graphs
 animations
+data
 *.db
 .report_template_sm.ipynb
 .report_template_lg.ipynb

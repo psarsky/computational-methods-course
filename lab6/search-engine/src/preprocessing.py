@@ -11,14 +11,13 @@ from nltk.corpus import stopwords
 from scipy.sparse import csr_matrix, diags
 
 
-def build_vocabulary(db_path, min_df=5, max_df=0.5, max_features=100000):
+def build_vocabulary(db_path, min_df=5, max_df=0.5):
     """Builds a term dictionary from documents in the database.
 
     Args:
         db_path (string): Path to the SQLite database.
         min_df (int, optional): Minimum number of documents a term must appear in. Defaults to 5.
         max_df (float, optional): Maximum percentage of documents a term can appear in. Defaults to 0.5.
-        max_features (int, optional): Maximum number of terms in the dictionary. Defaults to 10000.
 
     Returns:
         dict: A dictionary mapping terms to their indices.
@@ -53,13 +52,7 @@ def build_vocabulary(db_path, min_df=5, max_df=0.5, max_features=100000):
         if min_df <= count <= max_df * n_documents
     ]
 
-    if len(filtered_terms) > max_features:
-        sorted_terms = sorted(filtered_terms, key=lambda t: -term_doc_counts[t])
-        final_terms = sorted_terms[:max_features]
-    else:
-        final_terms = filtered_terms
-
-    vocabulary = {term: idx for idx, term in enumerate(final_terms)}
+    vocabulary = {term: i for i, term in enumerate(filtered_terms)}
 
     conn.close()
 
