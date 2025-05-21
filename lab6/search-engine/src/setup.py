@@ -196,7 +196,9 @@ def load_or_compute_svd(use_idf, normalized_matrix, k_svd):
     svd_file_path = os.path.join(data_dir, svd_file_name)
 
     if os.path.exists(svd_file_path):
-        print(f"\nLoading precomputed SVD components (k={k_svd}) from file...")
+        print(
+            f"\nLoading precomputed SVD components (k={k_svd}, {"idf" if use_idf else "no idf"}) from file..."
+        )
         try:
             with open(svd_file_path, "rb") as svd_file:
                 svd_components = pickle.load(svd_file)
