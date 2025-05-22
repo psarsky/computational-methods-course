@@ -1,6 +1,5 @@
 """Module for pre-processing documents and creating a term-document matrix."""
 
-import os
 import re
 import sqlite3
 from collections import Counter
@@ -132,15 +131,3 @@ def apply_idf(term_doc_matrix):
     tfidf_matrix = idf_diag.dot(term_doc_matrix)
 
     return tfidf_matrix, idf_values
-
-
-if __name__ == "__main__":
-    # for testing purposes
-    path = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-        "data",
-        "simplified_wiki_index.db",
-    )
-    voc = build_vocabulary(path)
-    print("Vocabulary size:", len(voc))
-    print("Sample vocabulary:", list(voc.items())[:100])

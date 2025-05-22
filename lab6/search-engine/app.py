@@ -42,7 +42,7 @@ engine_components = {
     "doc_ids": None,
     "idf_values": None,
     "use_svd": True,
-    "k_svd": 100,
+    "k_svd": 1000,
     "k_results": 10,
 }
 
@@ -314,7 +314,6 @@ def serve_static(path):
 
 if __name__ == "__main__":
     check_nltk_data()
-    os.makedirs("data", exist_ok=True)
 
     print("\nStarting search engine API on http://localhost:5000")
     threading.Thread(target=initialize_engine).start()
