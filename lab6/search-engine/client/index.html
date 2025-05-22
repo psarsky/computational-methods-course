@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVD Search Engine</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SVD Search Engine</h1>
+        </header>
+
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Enter your search query...">
+            <button id="search-button">Search</button>
+        </div>
+
+        <div id="config-panel">
+            <h3>Search Configuration</h3>
+            <div class="config-item">
+                <label for="use-svd">Use SVD:</label>
+                <input type="checkbox" id="use-svd" checked>
+            </div>            <div class="config-item">
+                <label for="k-svd">Singular values:</label>
+                <select id="k-svd">
+                    <option value="100">100</option>
+                    <option value="200">200</option>
+                    <option value="500">500</option>
+                    <option value="1000">1000</option>
+                </select>
+            </div>
+            <div class="config-item">
+                <label for="k-results">Results to show:</label>
+                <input type="number" id="k-results" min="1" max="50" value="10">
+            </div>
+            <button id="save-config">Save Configuration</button>
+        </div>
+
+        <div id="status" class="status">
+            Checking search engine status...
+        </div>
+
+        <div id="search-time" class="search-time">
+            <!-- Search time will appear here -->
+        </div>
+
+        <div id="results-container">
+            <!-- Search results will appear here -->
+        </div>
+
+        <div id="document-view" class="hidden">
+            <button id="back-button">← Back to Results</button>
+            <div id="document-content">
+                <!-- Document content will appear here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
