@@ -3,6 +3,8 @@
 import re
 
 import numpy as np
+from nltk.stem import PorterStemmer
+from sklearn.preprocessing import normalize
 
 
 def query_to_vector(query_text, vocabulary, idf_values=None):
@@ -14,17 +16,27 @@ def query_to_vector(query_text, vocabulary, idf_values=None):
         idf_values (numpy.ndarray, optional): Array of IDF values for terms.
 
     Returns:
-        numpy.ndarray: Query feature vector.
+        numpy.ndarray: Normalized query feature vector.
     """
+    stemmer = PorterStemmer()
     query_text = query_text.lower()
-    terms = re.findall(r"\b[a-z]{3,}\b", query_text)
+    words = re.findall(r"\b[a-z]{3,}\b", query_text)
+
+    terms = [stemmer.stem(word) for word in words]
 
     query_vector = np.zeros(len(vocabulary))
 
+    term_counts = {}
+    total_terms = 0
     for term in terms:
         if term in vocabulary:
             term_idx = vocabulary[term]
-            query_vector[term_idx] += 1
+            term_counts[term_idx] = term_counts.get(term_idx, 0) + 1
+            total_terms += 1
+
+    if total_terms > 0:
+        for term_idx, count in term_counts.items():
+            query_vector[term_idx] = count / total_terms
 
     if idf_values is not None:
         query_vector = query_vector * idf_values
@@ -88,19 +100,15 @@ def search_documents_svd(
 
     query_concepts = query_vector @ U_k @ np.diag(1.0 / D_k)
 
-    doc_concepts = V_T_k.T
-
-    doc_norms = np.sqrt(np.sum(doc_concepts**2, axis=1))
-    doc_norms = np.maximum(doc_norms, 1e-10)
-    normalized_docs = doc_concepts / doc_norms[:, np.newaxis]
+    normalized_docs = normalize(V_T_k, axis=0, norm='l2')
 
     query_norm = np.linalg.norm(query_concepts)
     if query_norm > 0:
         query_concepts = query_concepts / query_norm
 
-    similarities = np.abs(query_concepts @ normalized_docs.T)
+    similarities = np.abs(query_concepts @ normalized_docs)
 
     top_indices = np.argsort(-similarities)[:k]
-    results = [(doc_ids[idx], similarities[idx]) for idx in top_indices]
+    results = [(doc_ids[i], similarities[i]) for i in top_indices]
 
     return results

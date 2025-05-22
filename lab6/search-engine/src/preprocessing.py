@@ -7,6 +7,7 @@ from collections import Counter
 # import nltk
 import numpy as np
 from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
 from scipy.sparse import csr_matrix, diags
 
 
@@ -23,6 +24,7 @@ def build_vocabulary(db_path, min_df=5, max_df=0.5):
     """
     # nltk.download("stopwords")
     stop_words = set(stopwords.words("english"))
+    stemmer = PorterStemmer()
 
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -31,17 +33,15 @@ def build_vocabulary(db_path, min_df=5, max_df=0.5):
     n_documents = cursor.fetchone()[0]
 
     term_doc_counts = Counter()
-    all_terms = set()
 
     cursor.execute("SELECT id, content FROM pages")
     for _, content in cursor.fetchall():
         content = content.lower()
-        terms = re.findall(r"\b[a-z]{3,}\b", content)
+        words = re.findall(r"\b[a-z]{3,}\b", content)
 
-        terms = [term for term in terms if term not in stop_words]
+        terms = [stemmer.stem(word) for word in words if word not in stop_words]
 
         unique_terms = set(terms)
-        all_terms.update(unique_terms)
         for term in unique_terms:
             term_doc_counts[term] += 1
 
@@ -72,6 +72,7 @@ def create_document_vectors(db_path, vocabulary):
     """
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
+    stemmer = PorterStemmer()
 
     cursor.execute("SELECT COUNT(*) FROM pages")
     n_documents = cursor.fetchone()[0]
@@ -88,18 +89,25 @@ def create_document_vectors(db_path, vocabulary):
         doc_ids.append(doc_id)
 
         content = content.lower()
-        terms = re.findall(r"\b[a-z]{3,}\b", content)
+        words = re.findall(r"\b[a-z]{3,}\b", content)
+
+        terms = [stemmer.stem(word) for word in words]
 
         term_counts = {}
+        total_terms = 0
         for term in terms:
             if term in vocabulary:
                 term_idx = vocabulary[term]
                 term_counts[term_idx] = term_counts.get(term_idx, 0) + 1
+                total_terms += 1
+
+        if total_terms == 0:
+            continue
 
         for term_idx, count in term_counts.items():
             row_indices.append(term_idx)
             col_indices.append(doc_idx)
-            values.append(count)
+            values.append(count / total_terms)
 
     term_doc_matrix = csr_matrix(
         (values, (row_indices, col_indices)), shape=(vocab_size, n_documents)
@@ -125,7 +133,7 @@ def apply_idf(term_doc_matrix):
 
     doc_counts = np.array((term_doc_matrix > 0).sum(axis=1)).flatten()
 
-    idf_values = np.log(n_docs / (doc_counts + 1))  # +1 for stability
+    idf_values = np.log(n_docs / doc_counts)
 
     idf_diag = diags(idf_values)
     tfidf_matrix = idf_diag.dot(term_doc_matrix)
