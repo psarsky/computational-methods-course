@@ -1,12 +1,22 @@
+"""Fourier transform and pattern detection in images"""
+
 import os
 
 import numpy as np
 from skimage.feature import peak_local_max
-from util import (load_and_preprocess_image, visualize_fourier_components,
+from util import (load_and_preprocess_image, visualize_fourier_transformation,
                   visualize_results)
 
 
 def analyze_fourier_transform(image):
+    """Perform Fourier transform analysis on the image.
+
+    Args:
+        image (np.ndarray): Input image.
+
+    Returns:
+        tuple: Magnitude and phase values of the Fourier transform.
+    """
     fft_image = np.fft.fft2(image)
     fft_shifted = np.fft.fftshift(fft_image)
 
@@ -19,6 +29,15 @@ def analyze_fourier_transform(image):
 
 
 def detect_pattern_correlation(image, pattern):
+    """Detects the correlation between the image and the pattern using Fourier transform.
+
+    Args:
+        image (np.ndarray): Input image.
+        pattern (np.ndarray): Pattern to detect.
+
+    Returns:
+        np.ndarray: Correlation map.
+    """
     ph, pw = pattern.shape
 
     pattern_rotated = np.rot90(pattern, 2)
@@ -37,6 +56,16 @@ def detect_pattern_correlation(image, pattern):
 
 
 def find_pattern_locations(correlation, threshold_percentile=95, min_distance=10):
+    """Finds the locations of the detected patterns in the correlation map.
+
+    Args:
+        correlation (np.ndarray): Correlation map.
+        threshold_percentile (int, optional): Percentile threshold for peak detection. Defaults to 95.
+        min_distance (int, optional): Minimum distance between detected peaks. Defaults to 10.
+
+    Returns:
+        tuple: List of detected pattern locations and the threshold value.
+    """
     threshold = np.percentile(correlation, threshold_percentile)
 
     peaks = peak_local_max(
@@ -47,6 +76,7 @@ def find_pattern_locations(correlation, threshold_percentile=95, min_distance=10
 
 
 def main():
+    """Main function to perform image analysis."""
     IMG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "images")
     os.makedirs(IMG_PATH, exist_ok=True)
 
@@ -56,8 +86,8 @@ def main():
             "image_path": os.path.join(IMG_PATH, "galia.png"),
             "pattern_path": os.path.join(IMG_PATH, "galia_e.png"),
             "invert_colors": True,
-            "threshold_percentile": 99.9902,    # best threshold value (found by trial and error)
-        },                                      # that detects all 'e' characters without false positives
+            "threshold_percentile": 99.9902,  # best threshold value (found by trial and error)
+        },  # which detects all 'e' characters without false positives
         {
             "name": "Fish school",
             "image_path": os.path.join(IMG_PATH, "school.jpg"),
@@ -83,7 +113,9 @@ def main():
 
         print("\n1. Fourier transformation analysis")
         magnitude_log, phase = analyze_fourier_transform(main_image)
-        visualize_fourier_components(magnitude_log, phase, main_image, dataset["name"])
+        visualize_fourier_transformation(
+            magnitude_log, phase, main_image, dataset["name"]
+        )
 
         print("\n2. Pattern detection")
         correlation = np.abs(detect_pattern_correlation(main_image, pattern_image))

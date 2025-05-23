@@ -1,9 +1,20 @@
+"""Visualization and image loading utilities for image analysis."""
+
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
 
 def load_and_preprocess_image(image_path, invert_colors=False):
+    """Load and preprocess an image.
+
+    Args:
+        image_path (str): Path to the image file.
+        invert_colors (bool, optional): Whether to invert the colors of the image. Defaults to False.
+
+    Returns:
+        np.ndarray: Preprocessed image as a NumPy array.
+    """
     try:
         img = Image.open(image_path)
 
@@ -23,51 +34,15 @@ def load_and_preprocess_image(image_path, invert_colors=False):
         return None
 
 
-def visualize_results(
-    original_image, pattern, correlation, locations, title_prefix="", pattern_shape=None
-):
-    fig1, axes = plt.subplots(2, 2, figsize=(10, 10))
-    fig1.suptitle(f"{title_prefix} - Pattern detection", fontsize=16)
+def visualize_fourier_transformation(magnitude_log, phase, image, title=""):
+    """Visualize the values of magnitude and phase of the Fourier transformation of an image.
 
-    axes[0, 0].imshow(original_image, cmap="gray")
-    if locations and pattern_shape is not None:
-        ph, pw = pattern_shape
-        for y, x in locations:
-            rect = plt.Rectangle(
-                (x - pw, y - ph), pw, ph, linewidth=1, edgecolor="r", facecolor="none"
-            )
-            axes[0, 0].add_patch(rect)
-    axes[0, 0].set_title(f"Detected patterns ({len(locations)} found)", pad=10)
-    axes[0, 0].axis("off")
-
-    axes[0, 1].imshow(pattern, cmap='gray')
-    axes[0, 1].set_title('Pattern')
-    axes[0, 1].axis('off')
-
-    axes[1, 0].imshow(correlation, cmap="hot")
-    axes[1, 0].set_title("Correlation map", pad=10)
-    axes[1, 0].axis("off")
-
-    axes[1, 1].hist(correlation.flatten(), bins=100, alpha=0.7)
-    axes[1, 1].set_title("Correlation histogram", pad=10)
-    axes[1, 1].set_xlabel("Correlation value")
-    axes[1, 1].set_ylabel("Frequency")
-
-    plt.subplots_adjust(left=0.08, right=0.92, top=0.9, bottom=0.1)
-
-    plt.show()
-
-    fig2 = plt.figure(figsize=(8, 8))
-    fig2.suptitle(f"{title_prefix} - 3D correlation surface", fontsize=16)
-
-    ax_3d = fig2.add_subplot(111, projection="3d")
-    y_3d, x_3d = np.mgrid[0 : correlation.shape[0] : 10, 0 : correlation.shape[1] : 10]
-    ax_3d.plot_surface(x_3d, y_3d, correlation[::10, ::10], cmap="hot", alpha=0.7)
-
-    plt.show()
-
-
-def visualize_fourier_components(magnitude_log, phase, image, title=""):
+    Args:
+        magnitude_log (np.ndarray): Array of magnitude values in log scale.
+        phase (np.ndarray): Array of phase values.
+        image (np.ndarray): Original image.
+        title (str, optional): Title for the plot. Defaults to "".
+    """
     fig = plt.figure(figsize=(10, 10))
     fig.suptitle(f"{title} - Fourier transformation analysis", fontsize=16, y=0.98)
 
@@ -91,4 +66,58 @@ def visualize_fourier_components(magnitude_log, phase, image, title=""):
     ax_bottom_right.axis("off")
 
     plt.subplots_adjust(left=0.08, right=0.92, top=0.9, bottom=0.05)
+    plt.show()
+
+
+def visualize_results(
+    original_image, pattern, correlation, locations, title_prefix="", pattern_shape=None
+):
+    """Visualize the results of pattern matching.
+
+    Args:
+        original_image (np.ndarray): Image to detect patterns in.
+        pattern (np.ndarray): Pattern to detect.
+        correlation (np.ndarray): Correlation map.
+        locations (list): List of detected pattern locations (coordinates of lower right corners).
+        title_prefix (str, optional): Prefix for the title of the plots. Defaults to "".
+        pattern_shape (tuple, optional): Shape of the pattern (height, width). Defaults to None.
+    """
+    fig1, axes = plt.subplots(2, 2, figsize=(10, 10))
+    fig1.suptitle(f"{title_prefix} - Pattern detection", fontsize=16)
+
+    axes[0, 0].imshow(original_image, cmap="gray")
+    if locations and pattern_shape is not None:
+        ph, pw = pattern_shape
+        for y, x in locations:
+            rect = plt.Rectangle(
+                (x - pw, y - ph), pw, ph, linewidth=1, edgecolor="r", facecolor="none"
+            )
+            axes[0, 0].add_patch(rect)
+    axes[0, 0].set_title(f"Detected patterns ({len(locations)} found)", pad=10)
+    axes[0, 0].axis("off")
+
+    axes[0, 1].imshow(pattern, cmap="gray")
+    axes[0, 1].set_title("Pattern")
+    axes[0, 1].axis("off")
+
+    axes[1, 0].imshow(correlation, cmap="hot")
+    axes[1, 0].set_title("Correlation map", pad=10)
+    axes[1, 0].axis("off")
+
+    axes[1, 1].hist(correlation.flatten(), bins=100, alpha=0.7)
+    axes[1, 1].set_title("Correlation histogram", pad=10)
+    axes[1, 1].set_xlabel("Correlation value")
+    axes[1, 1].set_ylabel("Frequency")
+
+    plt.subplots_adjust(left=0.08, right=0.92, top=0.9, bottom=0.1)
+
+    plt.show()
+
+    fig2 = plt.figure(figsize=(8, 8))
+    fig2.suptitle(f"{title_prefix} - 3D correlation surface", fontsize=16)
+
+    ax_3d = fig2.add_subplot(111, projection="3d")
+    y_3d, x_3d = np.mgrid[0 : correlation.shape[0] : 10, 0 : correlation.shape[1] : 10]
+    ax_3d.plot_surface(x_3d, y_3d, correlation[::10, ::10], cmap="hot", alpha=0.7)
+
     plt.show()
