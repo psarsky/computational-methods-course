@@ -43,7 +43,7 @@ def plot_ellipsoid(sphere_coords, transformed_points, singular_values, V, title)
         ax.quiver(origin[0], origin[1], origin[2],
                  axis[0], axis[1], axis[2],
                  color=['r', 'g', 'y'][i], linewidth=3, arrow_length_ratio=0.1,
-                 label=f'Półoś {i+1}: {singular_values[i]:.2f}')
+                 label=f'Semi-axis {i+1}: {singular_values[i]:.2f}')
 
     ax.set_xlabel('X')
     ax.set_ylabel('Y')

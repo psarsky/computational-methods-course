@@ -51,7 +51,7 @@ def compare_images(original_img, compressed_images, k_values):
     _, axes = plt.subplots(2, n+1, figsize=(15, 8))
 
     axes[0, 0].imshow(original_img, cmap='gray')
-    axes[0, 0].set_title('Oryginalny obraz')
+    axes[0, 0].set_title('Original image')
     axes[0, 0].axis('off')
 
     axes[1, 0].axis('off')
@@ -70,8 +70,8 @@ def compare_images(original_img, compressed_images, k_values):
 
     plt.figure(figsize=(10, 6))
     plt.plot(k_values, [norms[k] for k in k_values], 'o-')
-    plt.title('Zależność ||I-I_a|| od k')
-    plt.xlabel('k (liczba wartości osobliwych)')
+    plt.title('||I-I_a|| vs. k')
+    plt.xlabel('k (amount of singular values)')
     plt.ylabel('||I-I_a||')
     plt.grid(True)
     plt.show()
@@ -84,7 +84,7 @@ def analyze_compression(img, k_values):
     for k in k_values:
         compressed_size = k * (img.shape[0] + img.shape[1] + 1)
         compression_ratio = original_size / compressed_size
-        print(f"k = {k}: Współczynnik kompresji = {compression_ratio:.2f}x")
+        print(f"k = {k}: Compression ratio = {compression_ratio:.2f}x")
 
 
 def main():
