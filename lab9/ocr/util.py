@@ -1,4 +1,5 @@
 """Module for OCR utility functions."""
+
 import os
 from collections import defaultdict
 from functools import cmp_to_key

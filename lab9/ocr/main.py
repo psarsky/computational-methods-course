@@ -1,58 +1,13 @@
 """Optical Character Recognition (OCR) module with tests including different fonts, noise levels, and rotations."""
+
 import os
 from collections import defaultdict
-
 from difflib import SequenceMatcher
+
 from PIL import ImageOps
 from util import (IMG_DIR, correct_image_rotation, create_text_image,
                   denoise_image, load_font, load_image, read_text)
-
-
-def group_characters_into_lines(character_positions, font_name, font_size):
-    """Group detected characters by text lines."""
-    line_groups = defaultdict(list)
-    line_height = create_text_image("a", font_name, font_size).height
-
-    for y_pos, x_pos, character in character_positions:
-        matching_line = None
-        for existing_line_y in line_groups.keys():
-            if abs(y_pos - existing_line_y) < line_height:
-                matching_line = existing_line_y
-                break
-
-        if matching_line is not None:
-            line_groups[matching_line].append((x_pos, character))
-        else:
-            line_groups[y_pos] = [(x_pos, character)]
-
-    return [char_list for _, char_list in sorted(line_groups.items())]
-
-
-def reconstruct_words_from_lines(text_lines, font_name, font_size):
-    """Reconstruct words and sentences from character lines."""
-    reconstructed_text = ""
-    space_width_threshold = load_font(font_name, font_size).getlength(" ") * 0.7
-
-    for line_chars in text_lines:
-        if not line_chars:
-            continue
-
-        sorted_line = sorted(line_chars)
-        previous_x_position = sorted_line[0][0]
-
-        for char_index, (x_position, character) in enumerate(sorted_line):
-            if char_index > 0:
-                char_width = create_text_image(character, font_name, font_size).width
-                gap_size = x_position - previous_x_position - char_width
-                if gap_size > space_width_threshold:
-                    reconstructed_text += " "
-
-            reconstructed_text += character
-            previous_x_position = x_position
-
-        reconstructed_text += "\n"
-
-    return reconstructed_text
+from vis import display_results
 
 
 def ocr(image, font_name, font_size, confidence_threshold):
@@ -121,6 +76,8 @@ lorem ipsum dolor sit amet, consectetur adipiscing elit.
 proin pretium eros neque, a sodales mi pulvinar ut. 
 donec placerat malesuada efficitur? suspendisse!"""
 
+    results = []
+
     for font in fonts:
         print(f"\nNOISE TEST - {font}")
         print("=" * 40 + "\n")
@@ -133,11 +90,28 @@ donec placerat malesuada efficitur? suspendisse!"""
             )
             print(f"Font: {font}, noise: {noise}\n")
             print(f"Input text:\n{text}\n")
+
             for conf in conf_levels:
                 detected_text = ocr(image, font, font_size, conf)
+                accuracy = (
+                    SequenceMatcher(None, detected_text.strip(), text.strip()).ratio()
+                    * 100
+                )
+
+                results.append(
+                    {
+                        "font": font,
+                        "test_type": "noise",
+                        "noise_level": noise,
+                        "rotation_angle": 0,
+                        "confidence": conf,
+                        "accuracy": accuracy,
+                    }
+                )
+
                 print(f"Confidence: {conf}")
-                print(detected_text)
-                print(f"Accuracy: {SequenceMatcher(None, detected_text, text).ratio() * 100:.2f}%")
+                print(detected_text.strip())
+                print(f"Accuracy: {accuracy:.2f}%\n")
             print("-" * 40 + "\n")
 
         print(f"\n\nROTATION TEST - {font}")
@@ -153,12 +127,31 @@ donec placerat malesuada efficitur? suspendisse!"""
             )
             print(f"Font: {font}, rotation: {rotation}\n")
             print(f"Input text:\n{text}\n")
+
             for conf in conf_levels:
                 detected_text = ocr(image, font, font_size, conf)
+                accuracy = (
+                    SequenceMatcher(None, detected_text.strip(), text.strip()).ratio()
+                    * 100
+                )
+
+                results.append(
+                    {
+                        "font": font,
+                        "test_type": "rotation",
+                        "noise_level": 0,
+                        "rotation_angle": rotation,
+                        "confidence": conf,
+                        "accuracy": accuracy,
+                    }
+                )
+
                 print(f"Confidence: {conf}")
-                print(detected_text)
-                print(f"Accuracy: {SequenceMatcher(None, detected_text, text).ratio() * 100:.2f}%")
+                print(detected_text.strip())
+                print(f"Accuracy: {accuracy:.2f}%\n")
             print("-" * 40 + "\n")
+
+    display_results(results)
 
 
 if __name__ == "__main__":
