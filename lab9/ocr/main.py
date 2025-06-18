@@ -5,7 +5,7 @@ from collections import defaultdict
 from difflib import SequenceMatcher
 
 from PIL import ImageOps
-from util import (IMG_DIR, correct_image_rotation, create_text_image,
+from util import (IMG_DIR, CHARACTERS, correct_image_rotation, create_text_image,
                   denoise_image, load_font, load_image, read_text)
 from vis import display_results
 
@@ -60,7 +60,8 @@ def ocr(image, font_name, font_size, confidence_threshold):
 
         reconstructed_text += "\n"
 
-    return reconstructed_text
+    char_counter = {c: reconstructed_text.count(c) for c in CHARACTERS}
+    return reconstructed_text, char_counter
 
 
 def main():
@@ -68,8 +69,8 @@ def main():
     font_size = 40
     fonts = ["arial", "times"]
     conf_levels = [0.89, 0.91, 0.93, 0.95, 0.97]
-    noise_levels = [0, 15, 30]
-    rotation_angles = [15, 30]
+    noise_levels = [0, 15, 30, 50]
+    rotation_angles = [0, 15, 30, 50]
 
     text = """abcdefghijklmnopqrstuvwxyz0123456789?!.,
 lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -77,6 +78,7 @@ proin pretium eros neque, a sodales mi pulvinar ut.
 donec placerat malesuada efficitur? suspendisse!"""
 
     results = []
+    print_char_counts = True
 
     for font in fonts:
         print(f"\nNOISE TEST - {font}")
@@ -90,9 +92,10 @@ donec placerat malesuada efficitur? suspendisse!"""
             )
             print(f"Font: {font}, noise: {noise}\n")
             print(f"Input text:\n{text}\n")
+            print("Detected text:\n")
 
             for conf in conf_levels:
-                detected_text = ocr(image, font, font_size, conf)
+                detected_text, character_counts = ocr(image, font, font_size, conf)
                 accuracy = (
                     SequenceMatcher(None, detected_text.strip(), text.strip()).ratio()
                     * 100
@@ -105,13 +108,18 @@ donec placerat malesuada efficitur? suspendisse!"""
                         "noise_level": noise,
                         "rotation_angle": 0,
                         "confidence": conf,
-                        "accuracy": accuracy,
+                        "accuracy": round(accuracy, 2),
                     }
                 )
 
-                print(f"Confidence: {conf}")
                 print(detected_text.strip())
-                print(f"Accuracy: {accuracy:.2f}%\n")
+                print(f"Confidence: {conf}, Accuracy: {accuracy:.2f}%\n")
+                if print_char_counts:
+                    print_char_counts = False
+                    print("Character counts (only for the first image, for display purposes):")
+                    for char, count in character_counts.items():
+                        print(f"{char}: {count}")
+                    print()
             print("-" * 40 + "\n")
 
         print(f"\n\nROTATION TEST - {font}")
@@ -127,9 +135,10 @@ donec placerat malesuada efficitur? suspendisse!"""
             )
             print(f"Font: {font}, rotation: {rotation}\n")
             print(f"Input text:\n{text}\n")
+            print("Detected text:\n")
 
             for conf in conf_levels:
-                detected_text = ocr(image, font, font_size, conf)
+                detected_text, character_counts = ocr(image, font, font_size, conf)
                 accuracy = (
                     SequenceMatcher(None, detected_text.strip(), text.strip()).ratio()
                     * 100
@@ -142,7 +151,7 @@ donec placerat malesuada efficitur? suspendisse!"""
                         "noise_level": 0,
                         "rotation_angle": rotation,
                         "confidence": conf,
-                        "accuracy": accuracy,
+                        "accuracy": round(accuracy, 2),
                     }
                 )
 

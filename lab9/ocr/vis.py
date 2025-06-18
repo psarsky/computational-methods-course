@@ -14,21 +14,6 @@ def display_results(results):
     print("\nSUMMARY")
     print("=" * 60)
 
-    print("\nBest accuracy by test type:")
-    best_by_test = df.loc[df.groupby("test_type")["accuracy"].idxmax()]
-    print(
-        best_by_test[
-            [
-                "test_type",
-                "font",
-                "noise_level",
-                "rotation_angle",
-                "confidence",
-                "accuracy",
-            ]
-        ].to_string(index=False)
-    )
-
     print("\nAverage accuracy by font:")
     font_avg = df.groupby("font")["accuracy"].mean().reset_index()
     font_avg["accuracy"] = font_avg["accuracy"].round(2)
